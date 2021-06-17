@@ -4,18 +4,18 @@
 
 ### Short playbook description
 
-    That playbook can be used by the SOC team to have the ability to block IP or IPs based on an Azure sentinel incident.
-    The playbook get the current IPs from the named location (predefined) and append the new IP or IPs.
+    The SOC team can use that playbook to have the ability to block IPs or IPs based on an Azure sentinel incident.
+    The playbook gets the current IPs from the named location (predefined) and appends the new IP or IPs.
 
 
 ### Prerequisits
 
     Managed identity needs the following graph (Application) permissions:
-    * Policy.Read.All and Policy.ReadWrite.ConditionalAccess
+    * Policy.Read.All and Policy.ReadWrite.conditional access
     * Define the NamedLocationID parameter for the logic app
-    * Azure conditional access policy with a named location based block setting
+    * Azure conditional access policy with a named location-based block setting
     * Azure active directory premium 1 license for all users    
-    * Assign the 'system assigned managed identity' to the Azure rbac role 'Azure Sentinel Responder' on the Azure sentinel RG!
+    * Assign the 'system-assigned managed identity' to the Azure RBAC role 'Azure Sentinel Responder' on the Azure sentinel RG!
 
 ### Other informations
 
