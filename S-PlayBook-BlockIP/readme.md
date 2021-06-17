@@ -26,4 +26,4 @@
     * The number of IP addresses contained in a range is limited. Only CIDR masks greater than /8 are allowed when defining an IP range.
 
 
-[![Deploy Azure storage account](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FLagler-Gruener%2FSol-DeploySentinelPlaybooks%2Fmain%2FPlaybook%2Fdeployplaybook.json)
+[![Deploy Azure storage account](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FLagler-Gruener%2FSol-DeploySentinelPlaybooks%2Fmaster%2FS-PlayBook-BlockIP%2FPlaybook%2Fdeployplaybook.json)
