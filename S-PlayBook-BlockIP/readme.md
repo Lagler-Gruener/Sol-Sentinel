@@ -25,21 +25,5 @@
     * No private IP ranges can be defined!
     * The number of IP addresses contained in a range is limited. Only CIDR masks greater than /8 are allowed when defining an IP range.
 
-    > <b>To assign the permissions from above please execute the following powershell command in the Azure cloudshell (for example):</b>
-    > Keep in mind, the refresh will take some seconds!
 
-    $permissions = @('Policy.Read.All', 'Policy.ReadWrite.ConditionalAccess')
-
-    $GraphAppId = "00000003-0000-0000-c000-000000000000"
-    $GraphAppName = "Avl-Playbook-Blockip"
-
-    Connect-AzureAD
-    $MSI = (Get-AzureADServicePrincipal -Filter "displayName eq '$GraphAppName'")
-    $GraphServicePrincipal = Get-AzureADServicePrincipal -Filter "appId eq '$GraphAppId'"
-
-    foreach($permissionname in $permissions){
-    $AppRole = $GraphServicePrincipal.AppRoles | Where-Object {$_.Value -eq $permissionname -and 
-    $_.AllowedMemberTypes -contains "Application"}
-
-    New-AzureAdServiceAppRoleAssignment -ObjectId $MSI.ObjectId -PrincipalId $MSI.ObjectId -ResourceId $GraphServicePrincipal.ObjectId -Id $AppRole.Id
-    }
+[![Deploy Azure storage account](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FLagler-Gruener%2FSol-DeploySentinelPlaybooks%2Fmain%2FPlaybook%2Fdeployplaybook.json)
