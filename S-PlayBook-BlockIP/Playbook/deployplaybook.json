@@ -246,7 +246,7 @@
                                         "inputs": {
                                             "body": {
                                                 "incidentArmId": "@body('Alert_-_Get_incident')?['id']",
-                                                "message": "<p><u><strong>Dear SOC Team,</strong></u><br>\n<br>\nthe named location IP update wasn't successfull.<br>\nPlease contact the ACL operations.</p>"
+                                                "message": "<p><u><strong>Dear SOC Team,</strong></u><br>\n<br>\nthe named location IP update wasn't successfull.<br>\nPlease contact the operations team.</p>"
                                             },
                                             "host": {
                                                 "connection": {
