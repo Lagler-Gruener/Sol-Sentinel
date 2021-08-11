@@ -1,0 +1,285 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": { 
+        "LogicAppName": {
+            "defaultValue": "Avl-UC01-001-LogicApp-GetAADRiskySignIns",
+            "type": "String"
+        }      
+    },
+   "variables": {
+        "AzureMonitoringLogsConnectionName": "Avl-Connection-AzureMonitoringLogs-GetAADRiskySignIns"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Web/connections",
+            "apiVersion": "2016-06-01",
+            "name": "[variables('AzureMonitoringLogsConnectionName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "V1",
+            "properties": {
+                "displayName": "LogicApp",
+                "api": {
+                    "name": "[variables('AzureMonitoringLogsConnectionName')]",
+                    "id": "[concat('/subscriptions/',subscription().subscriptionId,'/providers/Microsoft.Web/locations/',resourceGroup().location,'/managedApis/azureloganalyticsdatacollector')]",
+                    "type": "Microsoft.Web/locations/managedApis"
+                }
+            }
+        },
+
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[parameters('LogicAppName')]",
+            "location": "[resourceGroup().location]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/connections', variables('AzureMonitoringLogsConnectionName'))]"
+            ],
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "Recurrence": {
+                            "recurrence": {
+                                "frequency": "Hour",
+                                "interval": 12,
+                                "timeZone": "W. Europe Standard Time"
+                            },
+                            "type": "Recurrence"
+                        }
+                    },
+                    "actions": {
+                        "Condition": {
+                            "actions": {
+                                "For_each": {
+                                    "foreach": "@body('Parse_IdentityRisks_result_to_JSON')?['value']",
+                                    "actions": {
+                                        "Send_Data_to_Sentinel": {
+                                            "runAfter": {
+                                                "Set_variable_JSONIdentityRisk": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "ApiConnection",
+                                            "inputs": {
+                                                "body": "@variables('JSONIdentityRisk')",
+                                                "headers": {
+                                                    "Log-Type": "AADRiskySignIns"
+                                                },
+                                                "host": {
+                                                    "connection": {
+                                                        "name": "@parameters('$connections')['azureloganalyticsdatacollector']['connectionId']"
+                                                    }
+                                                },
+                                                "method": "post",
+                                                "path": "/api/logs"
+                                            }
+                                        },
+                                        "Set_variable_JSONIdentityRisk": {
+                                            "runAfter": {},
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                                "name": "JSONIdentityRisk",
+                                                "value": "@{items('For_each')}"
+                                            }
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "Parse_IdentityRisks_result_to_JSON": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Foreach"
+                                },
+                                "Parse_IdentityRisks_result_to_JSON": {
+                                    "runAfter": {},
+                                    "type": "ParseJson",
+                                    "inputs": {
+                                        "content": "@body('HTTP_List_IdentityRisks')",
+                                        "schema": {
+                                            "properties": {
+                                                "value": {
+                                                    "items": {
+                                                        "properties": {
+                                                            "activity": {
+                                                                "type": "string"
+                                                            },
+                                                            "activityDateTime": {
+                                                                "type": "string"
+                                                            },
+                                                            "additionalInfo": {
+                                                                "type": "string"
+                                                            },
+                                                            "correlationId": {
+                                                                "type": "string"
+                                                            },
+                                                            "detectedDateTime": {
+                                                                "type": "string"
+                                                            },
+                                                            "detectionTimingType": {
+                                                                "type": "string"
+                                                            },
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "ipAddress": {
+                                                                "type": "string"
+                                                            },
+                                                            "lastUpdatedDateTime": {
+                                                                "type": "string"
+                                                            },
+                                                            "location": {
+                                                                "properties": {
+                                                                    "city": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "countryOrRegion": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "geoCoordinates": {},
+                                                                    "state": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            },
+                                                            "requestId": {
+                                                                "type": "string"
+                                                            },
+                                                            "riskDetail": {
+                                                                "type": "string"
+                                                            },
+                                                            "riskEventType": {
+                                                                "type": "string"
+                                                            },
+                                                            "riskLevel": {
+                                                                "type": "string"
+                                                            },
+                                                            "riskState": {
+                                                                "type": "string"
+                                                            },
+                                                            "source": {
+                                                                "type": "string"
+                                                            },
+                                                            "tokenIssuerType": {
+                                                                "type": "string"
+                                                            },
+                                                            "userDisplayName": {
+                                                                "type": "string"
+                                                            },
+                                                            "userId": {
+                                                                "type": "string"
+                                                            },
+                                                            "userPrincipalName": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "requestId",
+                                                            "correlationId",
+                                                            "riskEventType",
+                                                            "riskState",
+                                                            "riskLevel",
+                                                            "riskDetail",
+                                                            "source",
+                                                            "detectionTimingType",
+                                                            "activity",
+                                                            "tokenIssuerType",
+                                                            "ipAddress",
+                                                            "location",
+                                                            "activityDateTime",
+                                                            "detectedDateTime",
+                                                            "lastUpdatedDateTime",
+                                                            "userId",
+                                                            "userDisplayName",
+                                                            "userPrincipalName",
+                                                            "additionalInfo"
+                                                        ],
+                                                        "type": "object"
+                                                    },
+                                                    "type": "array"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "HTTP_List_IdentityRisks": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "expression": {
+                                "and": [
+                                    {
+                                        "equals": [
+                                            "@outputs('HTTP_List_IdentityRisks')['statusCode']",
+                                            200
+                                        ]
+                                    }
+                                ]
+                            },
+                            "type": "If"
+                        },
+                        "HTTP_List_IdentityRisks": {
+                            "runAfter": {
+                                "Initialize_variable_JSONIdentityRisk": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Http",
+                            "inputs": {
+                                "authentication": {
+                                    "audience": "https://graph.microsoft.com",
+                                    "type": "ManagedServiceIdentity"
+                                },
+                                "headers": {
+                                    "Content-Type": "application/json"
+                                },
+                                "method": "GET",
+                                "uri": "https://graph.microsoft.com/v1.0/identityProtection/riskDetections"
+                            }
+                        },
+                        "Initialize_variable_JSONIdentityRisk": {
+                            "runAfter": {},
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "JSONIdentityRisk",
+                                        "type": "string"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "azureloganalyticsdatacollector": {
+                                "connectionId": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.Web/connections/', variables('AzureMonitoringLogsConnectionName'))]",
+                                "connectionName": "[variables('AzureMonitoringLogsConnectionName')]",
+                                "id": "[concat('/subscriptions/',subscription().subscriptionId,'/providers/Microsoft.Web/locations/',resourceGroup().location,'/managedApis/azureloganalyticsdatacollector')]"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,98 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Rulename": {
+      "type": "String",
+      "defaultValue":"Avl-UC01-001-Analytics-Aad-RiskySignIns"
+    },
+    "workspacename": {
+      "type": "String",
+      "defaultValue": "loga-sentinel-demo"
+    }
+  },
+  "resources": [
+      {
+          "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+          "apiVersion": "2021-03-01-preview",
+          "name": "[concat(parameters('workspacename'),'/Microsoft.SecurityInsights/',parameters('Rulename'))]",
+          "location": "[resourceGroup().location]",
+          "kind": "Scheduled",
+          "properties": {
+              "description": "That rule detects an Azure risky signIn event. This is a custom solution, which brings some Azure AD P2 features into the system. \n\n Version: 1.0.0",
+              "displayName": "[parameters('Rulename')]",
+              "enabled": true,
+              "query": "let openrisks = AADRiskySignIns_CL | where riskState_s <> 'atRisk'; AADRiskySignIns_CL | join kind= leftanti (openrisks) on id_s | summarize arg_max(TimeGenerated, *) by CorrelationId",
+              "queryFrequency": "PT12H",
+              "queryPeriod": "PT12H",
+              "severity": "Medium",
+              "suppressionDuration": "PT12H",
+              "suppressionEnabled": false,
+              "triggerOperator": "GreaterThan",
+              "triggerThreshold": 0,
+              "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": false,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5M",
+                        "matchingMethod": "AllEntities"
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+              "entityMappings": [
+                  {
+                      "entityType": "Account",
+                      "fieldMappings": [
+                          {
+                              "identifier": "FullName",
+                              "columnName": "userPrincipalName_s"
+                          }
+                      ]
+                  },
+                  {
+                      "entityType": "IP",
+                      "fieldMappings": [
+                          {
+                              "identifier": "Address",
+                              "columnName": "IPAddress"
+                          }
+                      ]
+                  },
+                  {
+                      "entityType": "CloudApplication",
+                      "fieldMappings": [
+                          {
+                              "identifier": "Name",
+                              "columnName": "source_s"
+                          }
+                      ]
+                  },
+                  {
+                      "entityType": "Malware",
+                      "fieldMappings": [
+                          {
+                              "identifier": "Name",
+                              "columnName": "riskEventType_s"
+                          }
+                      ]
+                  },
+                  {
+                      "entityType": "URL",
+                      "fieldMappings": [
+                          {
+                              "identifier": "Url",
+                              "columnName": "location_state_s"
+                          }
+                      ]
+                  }
+              ],
+              "tactics": [
+                  "CredentialAccess"
+              ]
+          }
+      }
+  ]
+}
