@@ -3,12 +3,12 @@
     "contentVersion": "1.0.0.0",
     "parameters": { 
         "LogicAppName": {
-            "defaultValue": "Avl-UC01-001-LogicApp-GetAADRiskySignIns",
+            "defaultValue": "LogicApp-GetAADRiskySignIns",
             "type": "String"
         }      
     },
    "variables": {
-        "AzureMonitoringLogsConnectionName": "Avl-Connection-AzureMonitoringLogs-GetAADRiskySignIns"
+        "AzureMonitoringLogsConnectionName": "LogicA-Connection-AzureMonitoringLogs-GetAADRiskySignIns"
     },
     "resources": [
         {

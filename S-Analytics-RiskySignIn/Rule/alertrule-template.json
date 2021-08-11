@@ -4,11 +4,11 @@
   "parameters": {
     "Rulename": {
       "type": "String",
-      "defaultValue":"Avl-UC01-001-Analytics-Aad-RiskySignIns"
+      "defaultValue":"S-Analytics-Aad-RiskySignIns>"
     },
     "workspacename": {
       "type": "String",
-      "defaultValue": "loga-sentinel-demo"
+      "defaultValue": ""
     }
   },
   "resources": [

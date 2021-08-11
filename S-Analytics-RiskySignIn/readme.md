@@ -1,6 +1,7 @@
 ## Analytics Rule and LogicApp name
 
     S-Analytics-Aad-RiskySignIns
+    LogicApp-GetAADRiskySignIns
 
 <hr/>
 
@@ -44,7 +45,7 @@ That API is only with the Azure AD P2 license available!
 #### 1.) Install the Azure logic app
 Open the "Template deployment service" and execute the template /LogicApp/logicapptemplate.json
 
-[![Deploy Azure storage account](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FLagler-Gruener%2FSol-DeploySentinelPlaybooks%2Fmaster%2FS-PlayBook-BlockIP%2FPlaybook%2Fdeployplaybook.json)
+[![Deploy Azure storage account](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FLagler-Gruener%2FSol-Sentinel%2Fmaster%2FS-Analytics-RiskySignIn%2FLogicApp%2Flogicapptemplate.json)
 
 #### 2.) To assign the permission
 
@@ -52,7 +53,7 @@ Please execute the following PowerShell script:
 
 ```powershell
 
-$LogicAppMIName = "Avl-UC01-001-LogicApp-GetAADRiskySignIns"
+$LogicAppMIName = "S-Analytics-Aad-RiskySignIns"
 $permissions = @('IdentityRiskEvent.Read.All')
 $GraphAppId = "00000003-0000-0000-c000-000000000000"    
 
@@ -67,10 +68,14 @@ New-AzureAdServiceAppRoleAssignment -ObjectId $MSI.ObjectId -PrincipalId $MSI.Ob
 
 ```
 
+I always prefer the Azure cloudshell!
+
 #### 3.) Execute the LogicApp
-It's important, that you execute the LogicApp once to create the Custom Logc named 'AADRiskySignIns_CL'
+It's important, that you execute the LogicApp once to create the custom log named 'AADRiskySignIns_CL'
 
 #### 4.) Review the custom log createn and deploy the sentinel analytics rule
 Please review the creation of the custom log in azure log analytics.
-If the log isn't created, please enforce a risky signin (login with a Tor browser for example), wait 5 minutes and execute the LogicApp once more.
-If the log is created, please execute the Azure sentinel analytics rule template /alertrule-template.json
+If the log isn't created, please enforce a risky sign-in (login with a Tor browser for example), wait 5 minutes, and execute the LogicApp once more.
+If the log is created, please execute the Azure sentinel analytics rule template.
+
+[![Deploy Azure storage account](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FLagler-Gruener%2FSol-Sentinel%2Fmaster%2FS-Analytics-RiskySignIn%2FRule%2Falertrule-template.json)
