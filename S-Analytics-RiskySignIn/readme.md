@@ -1,6 +1,6 @@
 ## Analytics Rule and LogicApp name
 
-    S-Analytics-Aad-RiskySignIns
+    S-Analytics-Aad-RiskySignIns>
     LogicApp-GetAADRiskySignIns
 
 <hr/>
